@@ -1,7 +1,9 @@
+from abc import ABC
+
 from src.models.Entity import Entity
 
 
-class Destroyable(Entity):
+class Destroyable(Entity, ABC):
     def __init__(self, name):
         super().__init__(name)
 

@@ -1,7 +1,9 @@
+from abc import ABC
+
 from src.models.Entity import Entity
 
 
-class Player(Entity):
+class Player(Entity, ABC):
     def __init__(self, name):
         super().__init__(name)
 
