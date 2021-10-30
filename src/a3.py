@@ -41,17 +41,16 @@ class Game:
         return num_destroys
 
     def _create_entity(self, display: str) -> Entity:
-        match display:
-            case 'C':
-                return Collectable('C')
-            case 'B':
-                return Blocker('B')
-            case 'D':
-                return Destroyable('D')
-            case 'P':
-                return Player('P')
-            case _:
-                raise NotImplementedError
+        if display == COLLECTABLE:
+            return Collectable('C')
+        if display == BLOCKER:
+            return Blocker('B')
+        if display == DESTROYABLE:
+            return Destroyable('D')
+        if display == PLAYER:
+            return Player('P')
+        else:
+            raise NotImplementedError
 
     def generate_entities(self) -> None:
         """
@@ -93,30 +92,39 @@ class Game:
         return self.total_shots
 
     def rotate_grid(self, direction: str) -> None:
-        grid = self.grid
-        entities_map = grid.container
+        curr_entities_map = self.grid.get_entities()
 
-        match direction:
-            case 'LEFT':
-                offset = Position(-1, 0)
-                for position, entity in entities_map.items():
-                    new_position = position.add(offset)
-                    if grid.in_bounds(new_position):
-                        entities_map[new_position] = entity
-                    else:
-                        rotated_position = Position(new_position.get_x(), self.grid.size - 1)
-                        entities_map[rotated_position] = entity
-            case 'RIGHT':
-                offset = Position(1, 0)
-                for position, entity in entities_map.items():
-                    new_position = position.add(offset)
-                    if grid.in_bounds(new_position):
-                        entities_map[new_position] = entity
-                    else:
-                        rotated_position = Position(new_position.get_x(), 0)
-                        entities_map[rotated_position] = entity
-            case _:
-                raise NotImplementedError
+        if direction == DIRECTIONS[0]:
+            offset = Position(ROTATIONS[0][0], ROTATIONS[0][1])
+            self._helper(direction, offset, curr_entities_map)
+        elif direction == DIRECTIONS[1]:
+            offset = Position(ROTATIONS[1][0], ROTATIONS[1][1])
+            self._helper(direction, offset, curr_entities_map)
+        else:
+            raise NotImplementedError
+
+    def _helper(
+        self,
+        direction: str,
+        offset: Position,
+        curr_entities_map: dict[Position, Entity]
+    ) -> None:
+        for position, entity in curr_entities_map.items():
+            new_position = position.add(offset)
+            """
+                the only time that it is not inbounds for left rotation is when the
+                entity is at column 0 and we shift it to the left once more.
+                the only time that it is not inbounds for right rotation is when the
+                entity is at column size - 1 and we shift it to the right once more.
+                case in point: check if is in bounds, if it is not then we will fix the column accordingly
+            """
+            if not self.grid.in_bounds(new_position):
+                x = new_position.get_x()
+                y = self.grid.get_size() - 1 if direction == DIRECTIONS[0] else 0
+                new_position = Position(x, y)
+            # it is ok to overwrite the key in the existing map because the new_position object is a different
+            # position; hence, will have different hash value and will make a new entry in the map
+            curr_entities_map[new_position] = entity
 
     def step(self) -> None:
         pass

@@ -6,9 +6,9 @@ DESTROYABLE = "D"
 BLOCKER = "B"
 BOMB = "O"
 
-MOVE = (0, -1)
+MOVE = (-1, 0)
 FIRE = (0, 1)
-ROTATIONS = ((-1, 0), (1, 0))
+ROTATIONS = ((0, -1), (0, 1))
 SPLASH = ((0, 1), (1, 1), (-1, 1), (-1, -1), (1, -1), (0, -1),
           (1, 0), (-1, 0))
 LEFT = "A"
